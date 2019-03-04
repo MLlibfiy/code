@@ -18,6 +18,14 @@ import java.io.IOException;
 import java.util.Arrays;
 
 
+/**
+ * 枚举，相当于一个类的对象已经被定死
+ */
+enum Count {
+    my
+}
+
+
 class PageRankMapper extends Mapper<LongWritable, Text, Text, Text> {
     @Override
     protected void map(LongWritable key, Text value, Context context) throws IOException, InterruptedException {
@@ -44,7 +52,8 @@ class PageRankMapper extends Mapper<LongWritable, Text, Text, Text> {
         }
 
         //指定分隔符拼接数组
-        String outListStr = StringUtils.join(outlist, "\t");
+        //加上上一次网页的pr值
+        String outListStr = split[1] + "\t" + StringUtils.join(outlist, "\t");
         Text text = new Text(outListStr + "\t#");
 
         //每个网页的出链列表
@@ -59,20 +68,45 @@ class PageRankReducer extends Reducer<Text, Text, Text, Text> {
     @Override
     protected void reduce(Text key, Iterable<Text> values, Context context) throws IOException, InterruptedException {
 
+        //当前网页的pagerank值
         Double sum = 0.0;
 
-        String outList = "";
+        String lastPrAndOutList = "";
 
         for (Text value : values) {
             String[] split = value.toString().split("\t");
             String flag = split[split.length - 1];
-            //出链列表
+            //出链列表和上一次网页的pr值
             if ("#".equals(flag)) {
-                outList = value.toString().substring(0, value.toString().length() - 2);
+                lastPrAndOutList = value.toString();
             } else if ("*".equals(flag)) {//pagerank值加和
                 sum = sum + Double.parseDouble(split[0]);
             }
         }
+
+
+        String[] split = lastPrAndOutList.split("\t");
+
+        //上一次pr值
+        Double lastPr = Double.parseDouble(split[0]);
+
+        String[] outList = Arrays.copyOfRange(split, 1, split.length - 1);
+
+
+        //加上阻尼系数,计算当前pr值
+        Double currPr = 0.15 / 4 + 0.85 * sum;
+
+        //取绝对值
+        long abs = (long) (Math.abs(currPr - lastPr) * 1000);
+
+        //获取累加器对象
+        Counter counter = context.getCounter(Count.my);
+
+        //累加
+        /**
+         * 累加所有网页pr值的差值
+         */
+        counter.increment(abs);
 
         //写入到hdfs
         /**
@@ -81,7 +115,7 @@ class PageRankReducer extends Reducer<Text, Text, Text, Text> {
          * C 	1.5 	A 	B
          * D 	0.5 	B 	C
          */
-        context.write(key, new Text(sum.toString() + "\t" + outList));
+        context.write(key, new Text(currPr.toString() + "\t" + StringUtils.join(outList, "\t")));
 
     }
 }
@@ -90,31 +124,65 @@ class PageRankReducer extends Reducer<Text, Text, Text, Text> {
 public class RunJob {
 
     public static void main(String[] args) throws Exception {
+        int i = 0;
 
-        Configuration config = new Configuration();
-        FileSystem fs = FileSystem.get(config);
-        Job job = Job.getInstance(config);
-        job.setJarByClass(com.shujia.mr.pagerank.RunJob.class);
-        job.setJobName("pagerank");
-        job.setMapperClass(PageRankMapper.class);
-        job.setReducerClass(PageRankReducer.class);
-        job.setMapOutputKeyClass(Text.class);
-        job.setMapOutputValueClass(Text.class);
-        job.setInputFormatClass(TextInputFormat.class);
+        //收敛阈值
+        double flag = 0.1;
 
-        Path inputPath = new Path("E:\\第二期\\code\\mapreduce\\data\\pagerank.txt");
+        while (true) {
+            i++;
+            Configuration config = new Configuration();
+            FileSystem fs = FileSystem.get(config);
+            Job job = Job.getInstance(config);
+            job.setJarByClass(com.shujia.mr.pagerank.RunJob.class);
+            job.setJobName("pagerank");
+            job.setMapperClass(PageRankMapper.class);
+            job.setReducerClass(PageRankReducer.class);
+            job.setMapOutputKeyClass(Text.class);
+            job.setMapOutputValueClass(Text.class);
+            job.setInputFormatClass(TextInputFormat.class);
 
-        FileInputFormat.addInputPath(job, inputPath);
+            Path inputPath = new Path("E:\\第二期\\code\\mapreduce\\data\\pagerank.txt");
 
-        Path outPath = new Path("E:\\第二期\\code\\mapreduce\\data\\out");
-        if (fs.exists(outPath)) {
-            fs.delete(outPath, true);
+
+            //后一次读取前一次的输出结果
+            if (i > 1) {
+                inputPath = new Path("E:\\第二期\\code\\mapreduce\\data\\out" + (i - 1));
+            }
+
+            FileInputFormat.addInputPath(job, inputPath);
+
+            Path outPath = new Path("E:\\第二期\\code\\mapreduce\\data\\out" + i);
+            if (fs.exists(outPath)) {
+                fs.delete(outPath, true);
+            }
+
+            FileOutputFormat.setOutputPath(job, outPath);
+            boolean f = job.waitForCompletion(true);
+
+            //计算当前所有网页的pagerank的和上一次pagerank的差值的平均值
+            //当差值的平均值小于设定的阈值之后收敛
+
+            /**
+             * 累加器
+             *  在map端或者reduce端累加，在主函数里面读取的一个变量
+             *
+             */
+
+            //获取累加器的值
+            Counter counter = job.getCounters().findCounter(Count.my);
+            long value = counter.getValue();
+
+
+            //差值的平均值
+            double l = value / 4000.0;
+
+            System.out.println(l);
+
+            //当差值的平均值小于设定的阈值后收敛
+            if (l < flag) {
+                break;
+            }
         }
-
-        FileOutputFormat.setOutputPath(job, outPath);
-        boolean f = job.waitForCompletion(true);
-
-
     }
-
 }
