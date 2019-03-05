@@ -49,7 +49,7 @@ public class UserController {
              * 2、数据内容   可选
              *
              */
-            if (resultSet.next()){
+            if (resultSet.next()) {
                 Message msg = new Message(1, "登录成功");
                 //spring 会自动将对象转成json字符串
                 return msg;
@@ -64,5 +64,53 @@ public class UserController {
         return msg;
     }
 
+    @RequestMapping("/register")
+    public Message register(String username, String password, String newpassword) {
+        //1、判断吗是否一致
+        if (!password.equals(newpassword)) {
+            return new Message(0, "两次输入的密码不一致");
+        }
 
+        //2、查询用户是否已存在
+        try {
+            //1、加载驱动
+            Class.forName("com.mysql.jdbc.Driver");
+            //2、建立连接
+            Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/student", "root", "123456");
+
+            //3、获取执行器
+            Statement stat = connection.createStatement();
+
+            String sql = "select * from user where username='" + username + "'";
+
+            //执行查询
+            ResultSet resultSet = stat.executeQuery(sql);
+            //有结果返回登录成功
+            /**
+             * 一个正常的接口返回需要的东西
+             * 1、状态码  必须有
+             * 2、数据内容   可选
+             */
+            if (resultSet.next()) {
+                //spring 会自动将对象转成json字符串
+                return new Message(0, "用户已存在");
+            }
+
+            //3、注册
+
+            String registerSql = "insert into user(username,password) values('" + username + "','" + password + "')";
+            //影响的行数
+            int i = stat.executeUpdate(registerSql);
+
+            if (i==1){
+                return new Message(1, "注册成功");
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return new Message(0, "注册失败");
+    }
 }
