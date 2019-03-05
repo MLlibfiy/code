@@ -1,13 +1,11 @@
 package com.shujia.controller;
 
 import com.shujia.bean.Message;
+import com.shujia.util.Md5Util;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 
 /**
  * 童虎登录注册控制器
@@ -34,12 +32,22 @@ public class UserController {
             Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/student", "root", "123456");
 
             //3、获取执行器
-            Statement stat = connection.createStatement();
+            /**
+             * 这个执行器有sql注入bug
+             */
+            //Statement stat = connection.createStatement();
 
-            String sql = "select * from user where username='" + username + "' and password='" + password + "'";
+            String sql = "select * from user where username=? and password=?";
+
+            //预编译sql执行器
+            PreparedStatement preparedStatement = connection.prepareStatement(sql);
+
+            //参数后面传递过去
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, Md5Util.md5(password));
 
             //执行查询
-            ResultSet resultSet = stat.executeQuery(sql);
+            ResultSet resultSet = preparedStatement.executeQuery();
 
             //有结果返回登录成功
 
@@ -98,11 +106,11 @@ public class UserController {
 
             //3、注册
 
-            String registerSql = "insert into user(username,password) values('" + username + "','" + password + "')";
+            String registerSql = "insert into user(username,password) values('" + username + "','" + Md5Util.md5(password) + "')";
             //影响的行数
             int i = stat.executeUpdate(registerSql);
 
-            if (i==1){
+            if (i == 1) {
                 return new Message(1, "注册成功");
             }
 
