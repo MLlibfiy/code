@@ -9,15 +9,16 @@ import com.shujia.bean.User;
 public interface UserService {
 
     /**
-     *一般由架构师定义号接口中的方法，由开发人员来做具体实现
-     *
-     *
+     * 一般由架构师定义号接口中的方法，由开发人员来做具体实现
      */
     Message register(User user, String newpasword);
 
 
     //登录
     Message login(User user);
+
+    //修改密码
+    Message modiftPassword(User user, String twoPassword, String threePassword);
 
 
 }

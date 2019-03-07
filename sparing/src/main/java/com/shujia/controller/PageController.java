@@ -28,4 +28,9 @@ public class PageController {
         return "register"; //当浏览器输入/login，会返回/templates/login.html页面
     }
 
+    @GetMapping("/modifypasswordview")
+    public String modifypassword(){
+        return "modifypassword"; //当浏览器输入/login，会返回/templates/login.html页面
+    }
+
 }

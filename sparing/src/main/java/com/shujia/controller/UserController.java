@@ -3,8 +3,7 @@ package com.shujia.controller;
 import com.shujia.bean.Message;
 import com.shujia.bean.User;
 import com.shujia.service.UserService;
-import com.shujia.service.UserServiceImpl;
-import com.shujia.util.Md5Util;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -13,12 +12,24 @@ import java.sql.*;
 /**
  * 童虎登录注册控制器
  */
+
+/**
+ * 注解
+ * 告诉spring 这个类是搞什么的
+ * spring 启动之后会解析这个类。通过反射获取这个类的属性和方法
+ */
 @RestController
 public class UserController {
 
 
     //多态，父类引用指向子类对象
-    private UserService userService = new UserServiceImpl();
+
+    /**
+     * 依赖注入，
+     * spring 回去自己的上下文中找一个和这个属性类型匹配的对象注入到这个属性中
+     */
+    @Autowired
+    private UserService userService;
 
     /**
      * http://localhost:8080/login?username=张三&password=123
@@ -42,4 +53,12 @@ public class UserController {
         Message msg = userService.register(user, newpassword);
         return msg;
     }
+
+    @RequestMapping("/modifyPassword")
+    public Message modifyPassword(String username, String onepassword, String twopassword, String threepassword) {
+        User user = new User(username, onepassword);
+        return userService.modiftPassword(user, twopassword, threepassword);
+    }
+
+
 }
