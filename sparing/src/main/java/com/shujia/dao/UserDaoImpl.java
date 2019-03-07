@@ -9,7 +9,7 @@ import java.sql.*;
 /**
  * 数据库访问层
  */
-public class UserDaoImpl {
+public class UserDaoImpl implements UserDao{
 
     /**
      * 根据用户名查询用户

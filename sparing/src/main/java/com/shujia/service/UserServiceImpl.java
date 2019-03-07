@@ -2,12 +2,13 @@ package com.shujia.service;
 
 import com.shujia.bean.Message;
 import com.shujia.bean.User;
+import com.shujia.dao.UserDao;
 import com.shujia.dao.UserDaoImpl;
 import com.shujia.util.Md5Util;
 
-public class UserServiceImpl {
+public class UserServiceImpl implements UserService {
     //多次使用，定义为成员变量
-    private UserDaoImpl userDao = new UserDaoImpl();
+    private UserDao userDao = new UserDaoImpl();
 
     /**
      * 注册
@@ -38,5 +39,27 @@ public class UserServiceImpl {
         }
 
         return new Message(0, "注册成功");
+    }
+
+
+    //登录实现
+    @Override
+    public Message login(User user) {
+
+        //1、查询账号是否存在
+        User newUser = userDao.findByUserName(user.getUsernmae());
+        if (newUser == null) {
+            return new Message(0, "用户名输入错误");
+        }
+
+        //对密码加密
+        String password = Md5Util.md5(user.getPassword());
+
+        //判断密码是否正确
+        if (password.equals(newUser.getPassword())) {
+            return new Message(1, "登录成功");
+        }
+
+        return new Message(0, "密码错误");
     }
 }
