@@ -5,6 +5,7 @@ import com.shujia.bean.User;
 import com.shujia.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.*;
@@ -36,7 +37,7 @@ public class UserController {
      * <p>
      * 参数根据变量名匹配
      */
-    @RequestMapping("/login")
+    @RequestMapping(value = "/login",method = RequestMethod.POST)
     public Message login(String username, String password) {
         User user = new User();
         user.setUsernmae(username);
@@ -54,7 +55,7 @@ public class UserController {
         return msg;
     }
 
-    @RequestMapping("/modifyPassword")
+    @RequestMapping(value = "/modifyPassword",method = RequestMethod.POST)
     public Message modifyPassword(String username, String onepassword, String twopassword, String threepassword) {
         User user = new User(username, onepassword);
         return userService.modiftPassword(user, twopassword, threepassword);
