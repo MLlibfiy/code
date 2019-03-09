@@ -41,10 +41,14 @@ public class HbaseApi {
     @Test
     public void createTable() {
         //创建表得描述对象
-        HTableDescriptor student = new HTableDescriptor("student");
+        HTableDescriptor student = new HTableDescriptor("user1");
 
         //创建列蹴得描述对象
         HColumnDescriptor info = new HColumnDescriptor("info");
+
+        info.setMaxVersions(5);//版本数
+        info.setTimeToLive(5);//过期时间
+        info.setInMemory(true);
 
         student.addFamily(info);
         //创建表
@@ -327,7 +331,7 @@ public class HbaseApi {
         }
 
         try {
-            connection.close();
+             connection.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
