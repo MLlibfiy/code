@@ -6,12 +6,14 @@ import org.apache.hadoop.hbase.CellUtil;
 import org.apache.hadoop.hbase.HColumnDescriptor;
 import org.apache.hadoop.hbase.HTableDescriptor;
 import org.apache.hadoop.hbase.client.*;
+import org.apache.hadoop.hbase.filter.*;
 import org.apache.hadoop.hbase.util.Bytes;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class HbaseApi {
@@ -43,6 +45,7 @@ public class HbaseApi {
 
         //创建列蹴得描述对象
         HColumnDescriptor info = new HColumnDescriptor("info");
+
         student.addFamily(info);
         //创建表
         try {
@@ -147,6 +150,171 @@ public class HbaseApi {
             e.printStackTrace();
         }
     }
+
+    //删除数据
+    @Test
+    public void deleteData() {
+        try {
+            HTableInterface student = connection.getTable("student");
+
+            Delete delete = new Delete("001".getBytes());
+            //delete.deleteFamily("info".getBytes());
+            student.delete(delete);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 批量插入数据
+     */
+
+    @Test
+    public void insertAll() {
+        try {
+            HTableInterface student = connection.getTable("student");
+
+            List<Put> puts = new ArrayList<Put>();
+
+            //读取所有学生数据
+            ArrayList<Student> students = ReadUtil.read("E:\\第二期\\code\\hbase\\data\\students.txt", Student.class);
+
+            for (Student student1 : students) {
+                Put put = new Put(student1.getId().getBytes());
+                put.add("info".getBytes(), "name".getBytes(), student1.getName().getBytes());
+                put.add("info".getBytes(), "age".getBytes(), Bytes.toBytes(student1.getAge()));
+                put.add("info".getBytes(), "gender".getBytes(), student1.getGender().getBytes());
+                put.add("info".getBytes(), "clazz".getBytes(), student1.getClazz().getBytes());
+                puts.add(put);
+            }
+
+
+            //哈如多行数据
+            student.put(puts);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * scan
+     */
+    @Test
+    public void scan() {
+        try {
+            HTableInterface student = connection.getTable("student");
+
+            //构建scan对象
+            Scan scan = new Scan();
+            //增加需要扫描的列簇，列也可以增加
+            scan.addFamily("info".getBytes());
+
+            //增加扫描的开始key和结束key
+            scan.setStartRow("1500100916".getBytes());
+            scan.setStopRow("1500100918".getBytes());
+
+            //执行扫描，返回一个迭代器
+            ResultScanner scanner = student.getScanner(scan);
+
+            Result result;
+
+
+            //一行一行迭代
+            while ((result = scanner.next()) != null) {
+
+                //获取rowkey
+                String id = Bytes.toString(result.getRow());
+                String name = Bytes.toString(result.getValue("info".getBytes(), "name".getBytes()));
+
+                int age = Bytes.toInt(result.getValue("info".getBytes(), "age".getBytes()));
+
+                String gendet = Bytes.toString(result.getValue("info".getBytes(), "gender".getBytes()));
+                String clazz = Bytes.toString(result.getValue("info".getBytes(), "clazz".getBytes()));
+                System.out.println(id + "\t" + name + "\t" + age + "\t" + gendet + "\t" + clazz);
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 扫描文科一班的学生
+     */
+    @Test
+    public void filter() {
+        try {
+            HTableInterface student = connection.getTable("student");
+
+            //构建scan对象
+            Scan scan = new Scan();
+            //增加需要扫描的列簇，列也可以增加
+            scan.addFamily("info".getBytes());
+
+            //增加过滤器，过滤文科一班的学生
+            RegexStringComparator regexStringComparator = new RegexStringComparator("文科一班");
+            SingleColumnValueFilter columnValueFilter = new SingleColumnValueFilter("info".getBytes(), "clazz".getBytes(), CompareFilter.CompareOp.EQUAL, regexStringComparator);
+
+
+            SubstringComparator comp = new SubstringComparator("男");
+            SingleColumnValueFilter columnValueFilter1 = new SingleColumnValueFilter("info".getBytes(), "gender".getBytes(), CompareFilter.CompareOp.EQUAL, comp);
+
+
+            //前缀过滤
+            BinaryPrefixComparator prefixComparator = new BinaryPrefixComparator(Bytes.toBytes("终"));
+
+            SingleColumnValueFilter filter = new SingleColumnValueFilter(Bytes.toBytes("info"), Bytes.toBytes("name"),CompareFilter.CompareOp.EQUAL, prefixComparator);
+
+
+            /**
+             * rowkey前缀过滤
+                    *
+             */
+            /*BinaryPrefixComparator binaryPrefixComparator = new BinaryPrefixComparator("15001002".getBytes());
+            RowFilter rowFilter = new RowFilter(CompareFilter.CompareOp.EQUAL, binaryPrefixComparator);*/
+
+            //过滤器集合
+            FilterList fl = new FilterList(FilterList.Operator.MUST_PASS_ALL);
+
+            fl.addFilter(columnValueFilter);
+            fl.addFilter(columnValueFilter1);
+            fl.addFilter(filter);
+
+            //增加过滤器
+            scan.setFilter(fl);
+
+
+            //执行扫描，返回一个迭代器
+            ResultScanner scanner = student.getScanner(scan);
+
+            Result result;
+
+
+            //一行一行迭代
+            while ((result = scanner.next()) != null) {
+
+                //获取rowkey
+                String id = Bytes.toString(result.getRow());
+                String name = Bytes.toString(result.getValue("info".getBytes(), "name".getBytes()));
+
+                int age = Bytes.toInt(result.getValue("info".getBytes(), "age".getBytes()));
+
+                String gendet = Bytes.toString(result.getValue("info".getBytes(), "gender".getBytes()));
+                String clazz = Bytes.toString(result.getValue("info".getBytes(), "clazz".getBytes()));
+                System.out.println(id + "\t" + name + "\t" + age + "\t" + gendet + "\t" + clazz);
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
 
     @After
