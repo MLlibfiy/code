@@ -23,7 +23,7 @@ public class HbaseToHdfs {
     /**
      * 读取hbase数据的map
      */
-    public class HbaseToHdfsMap extends TableMapper<NullWritable, Text> {
+    public static class HbaseToHdfsMap extends TableMapper<NullWritable, Text> {
         @Override
         protected void map(ImmutableBytesWritable key, Result value, Context context) throws IOException, InterruptedException {
 
@@ -48,6 +48,7 @@ public class HbaseToHdfs {
         Configuration conf = new Configuration();
         conf.set("hbase.zookeeper.quorum", "node1:2181,node2:2181,node3:2181");
         Job job = Job.getInstance(conf);
+        //每一个reduce产生一个文件
         job.setNumReduceTasks(5);
         job.setJarByClass(HbaseToHdfs.class);
         job.setJobName("HbaseToHdfs");
