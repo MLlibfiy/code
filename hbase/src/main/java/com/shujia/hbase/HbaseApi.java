@@ -265,6 +265,10 @@ public class HbaseApi {
             SingleColumnValueFilter columnValueFilter = new SingleColumnValueFilter("info".getBytes(), "clazz".getBytes(), CompareFilter.CompareOp.EQUAL, regexStringComparator);
 
 
+            /**
+             * 列值过滤器：全表扫描
+             *
+             */
             SubstringComparator comp = new SubstringComparator("男");
             SingleColumnValueFilter columnValueFilter1 = new SingleColumnValueFilter("info".getBytes(), "gender".getBytes(), CompareFilter.CompareOp.EQUAL, comp);
 
@@ -272,12 +276,12 @@ public class HbaseApi {
             //前缀过滤
             BinaryPrefixComparator prefixComparator = new BinaryPrefixComparator(Bytes.toBytes("终"));
 
-            SingleColumnValueFilter filter = new SingleColumnValueFilter(Bytes.toBytes("info"), Bytes.toBytes("name"),CompareFilter.CompareOp.EQUAL, prefixComparator);
+            SingleColumnValueFilter filter = new SingleColumnValueFilter(Bytes.toBytes("info"), Bytes.toBytes("name"), CompareFilter.CompareOp.EQUAL, prefixComparator);
 
 
             /**
              * rowkey前缀过滤
-                    *
+             *
              */
             /*BinaryPrefixComparator binaryPrefixComparator = new BinaryPrefixComparator("15001002".getBytes());
             RowFilter rowFilter = new RowFilter(CompareFilter.CompareOp.EQUAL, binaryPrefixComparator);*/
@@ -320,6 +324,87 @@ public class HbaseApi {
     }
 
 
+    /**
+     * 建立列的索引
+     */
+    @Test
+    public void insertindex() {
+        try {
+            HTableInterface student = connection.getTable("student");
+            List<Put> puts = new ArrayList<Put>();
+
+            //读取所有学生数据
+            ArrayList<Student> students = ReadUtil.read("E:\\第二期\\code\\hbase\\data\\students.txt", Student.class);
+
+            for (Student student1 : students) {
+
+                //将班级当道rowkey里面，后面在对班级做过滤的时候速度会块很多，导致数据冗余
+                String rowkey = student1.getClazz().substring(0, 2) + "_" + student1.getId();
+
+                Put put = new Put(rowkey.getBytes());
+
+                put.add("info".getBytes(), "name".getBytes(), student1.getName().getBytes());
+                put.add("info".getBytes(), "age".getBytes(), Bytes.toBytes(student1.getAge()));
+                put.add("info".getBytes(), "gender".getBytes(), student1.getGender().getBytes());
+                put.add("info".getBytes(), "clazz".getBytes(), student1.getClazz().getBytes());
+                puts.add(put);
+            }
+
+            //哈如多行数据
+            student.put(puts);
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+
+    /**
+     * row 前缀过滤
+     */
+    @Test
+    public void queryClazz() {
+        try {
+            HTableInterface student = connection.getTable("student");
+
+            Scan scan = new Scan();
+            scan.addFamily("info".getBytes());
+            /**
+             * rowkey前缀过滤
+             *
+             */
+            BinaryPrefixComparator binaryPrefixComparator = new BinaryPrefixComparator("文科".getBytes());
+            RowFilter rowFilter = new RowFilter(CompareFilter.CompareOp.EQUAL, binaryPrefixComparator);
+
+            scan.setFilter(rowFilter);
+
+
+            Result result;
+            ResultScanner scanner = student.getScanner(scan);
+
+            //一行一行迭代
+            while ((result = scanner.next()) != null) {
+
+                //获取rowkey
+                String id = Bytes.toString(result.getRow()).split("_")[1];
+                String name = Bytes.toString(result.getValue("info".getBytes(), "name".getBytes()));
+
+                int age = Bytes.toInt(result.getValue("info".getBytes(), "age".getBytes()));
+
+                String gendet = Bytes.toString(result.getValue("info".getBytes(), "gender".getBytes()));
+                String clazz = Bytes.toString(result.getValue("info".getBytes(), "clazz".getBytes()));
+                System.out.println(id + "\t" + name + "\t" + age + "\t" + gendet + "\t" + clazz);
+            }
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @After
     public void close() {
@@ -331,7 +416,7 @@ public class HbaseApi {
         }
 
         try {
-             connection.close();
+            connection.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
