@@ -93,7 +93,7 @@ public class HbaseApi {
             HTableInterface student = connection.getTable("student");
 
             //创建put对象，指定rowkey
-            Put put = new Put("001".getBytes());
+            Put put = new Put("15001001003".getBytes());
 
             //插入一列
             put.add("info".getBytes(), "name".getBytes(), "张三".getBytes());
@@ -102,6 +102,7 @@ public class HbaseApi {
             put.add("info".getBytes(), "age".getBytes(), Bytes.toBytes(12));
 
             put.add("info".getBytes(), "gender".getBytes(), "男".getBytes());
+            put.add("info".getBytes(), "clazz".getBytes(), "文科一班".getBytes());
 
             student.put(put);
 
