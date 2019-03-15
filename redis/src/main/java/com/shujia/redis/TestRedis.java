@@ -1,8 +1,10 @@
 package com.shujia.redis;
 
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import org.junit.Test;
 import redis.clients.jedis.BitOP;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.params.SetParams;
 
 import java.util.HashMap;
@@ -54,6 +56,27 @@ public class TestRedis {
 
         //关闭连接
         jedis.close();
+
+    }
+
+    @Test
+    public void testPool(){
+        GenericObjectPoolConfig poolConfig = new GenericObjectPoolConfig();
+
+        poolConfig.setMaxTotal(100);//最大连接数
+        poolConfig.setMaxIdle(10);//最大空闲连接数
+        poolConfig.setMinIdle(5);//最小空闲连接数
+
+        //创建连接池
+        //连接池：里面保存了很多已经创建好的连接
+        JedisPool jedisPool = new JedisPool(poolConfig, "node1", 6379);
+
+        //获取一个连接
+        Jedis jedis = jedisPool.getResource();
+        jedis.select(3);
+        System.out.println(jedis.get("k1"));
+
+
 
     }
 
