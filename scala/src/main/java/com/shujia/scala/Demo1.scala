@@ -1,6 +1,6 @@
 package com.shujia.scala
 
-object Test {
+object Demo1 {
 
   /**
     * def 关键字
