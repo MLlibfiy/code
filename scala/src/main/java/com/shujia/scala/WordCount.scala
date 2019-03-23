@@ -29,16 +29,16 @@ object WordCount {
 
 
     lines
-      .flatMap(line => line.split("\t"))
-      .map(word => (word, 1)) //每一个单词后面加一个1
-      .groupBy(t => t._1) //根据单词分组
-      .map(t => {
-      //t   (E,List((E,1), (E,1), (E,1), (E,1)))
-      val word = t._1
-      val sum = t._2 //每个组内的集合
-        .map(x => x._2) //取出后面的1
-        .sum
-      s"$word\t$sum"
+        .flatMap(line => line.split("\t"))
+        .map(word => (word, 1)) //每一个单词后面加一个1
+        .groupBy(t => t._1) //根据单词分组
+        .map(t => {
+        //t   (E,List((E,1), (E,1), (E,1), (E,1)))
+        val word = t._1
+        val sum = t._2 //每个组内的集合
+          .map(x => x._2) //取出后面的1
+          .sum
+        s"$word\t$sum"
 
     }).foreach(println)
 
