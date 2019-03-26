@@ -2,7 +2,7 @@ package com.shujia
 
 import org.apache.spark.{SparkConf, SparkContext}
 
-object Demo3Sample {
+object Demo4Sample {
   /**
     *
     * simple  抽样算子  返回一个RDD

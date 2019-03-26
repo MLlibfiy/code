@@ -2,7 +2,7 @@ package com.shujia
 
 import org.apache.spark.{SparkConf, SparkContext}
 
-object Demo3GroupByKey {
+object Demo5GroupByKey {
   /**
     *
     * groupByKey   分区类算子，必须作用在kv格式的RDD上
