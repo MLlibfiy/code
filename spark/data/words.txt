@@ -1,0 +1,9 @@
+java,scala,hadoop,hive
+java,scala,hadoop,hive
+java,scala,hadoop,hive
+java,scala,hadoop,hive,hbase
+zookeeper,flume,sqoop
+zookeeper,flume,sqoop
+zookeeper,flume,sqoop
+zookeeper,flume,sqoop
+maven,git,zookeeper,flume,sqoop
