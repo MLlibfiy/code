@@ -1,5 +1,6 @@
 package com.shujia
 
+import scalademo
 import org.apache.spark.{SparkConf, SparkContext}
 
 /**

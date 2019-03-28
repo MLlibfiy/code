@@ -1,4 +1,4 @@
-package com.shujia.scala
+package com.shujia.scalademo
 
 /**
   * 在java里面函数得依赖于对象执行，通过static修饰得方法依赖于类对象来执行

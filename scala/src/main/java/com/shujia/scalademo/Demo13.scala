@@ -1,4 +1,4 @@
-package com.shujia.scala
+package com.shujia.scalademo
 
 /**
   * 偏应用函数，函数柯里化

@@ -1,4 +1,4 @@
-package com.shujia.scala;
+package com.shujia.scalademo;
 
 
 public class Student {

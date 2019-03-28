@@ -1,4 +1,4 @@
-package com.shujia.scala
+package com.shujia.scalademo
 
 object Demo11Set {
 

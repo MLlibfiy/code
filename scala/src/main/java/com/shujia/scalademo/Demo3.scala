@@ -1,4 +1,4 @@
-package com.shujia.scala
+package com.shujia.scalademo
 
 /**
   * 类和对象

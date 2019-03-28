@@ -1,4 +1,4 @@
-package com.shujia.scala
+package com.shujia.scalademo
 
 object Demo13Implicit {
 
@@ -20,7 +20,7 @@ object Demo13Implicit {
       * 写在其他object中也可以，需要用的时候导入就可以了
       *
       */
-    import com.shujia.scala.implicittest._
+    import com.shujia.scalademo.implicittest._
 
     /**
       * 隐式转换方法

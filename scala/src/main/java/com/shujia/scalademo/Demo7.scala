@@ -1,4 +1,4 @@
-package com.shujia.scala
+package com.shujia.scalademo
 
 /**
   * 高阶函数
@@ -25,6 +25,7 @@ object Demo7 {
     //连续调用
     val length = fun1()("数加学院")
     println(length)
+
 
 
   }

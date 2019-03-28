@@ -1,4 +1,7 @@
+package com.shujia
+
 import org.apache.spark.{SparkConf, SparkContext}
+
 import scala.math.random
 
 object SparkPI {
