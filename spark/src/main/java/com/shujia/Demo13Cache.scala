@@ -15,6 +15,10 @@ object Demo13Cache {
 
     val sc = new SparkContext(conf)
 
+
+    //设置checkpoint 存储地址
+    sc.setCheckpointDir("spark/data/checkpoint")
+
     var linesRDD = sc.textFile("spark/data/student.txt")
 
 
