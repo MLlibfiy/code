@@ -2,7 +2,6 @@ package com.shujia
 
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{SparkConf, SparkContext}
-
 object Demo13Cache {
   /**
     *
@@ -34,6 +33,21 @@ object Demo13Cache {
 
     //MEMORY_AND_DISK_SER   先放内存内存放不下放磁盘并且序列化（压缩）
     linesRDD = linesRDD.persist(StorageLevel.MEMORY_AND_DISK_SER)
+
+    /**
+      * 将当前RDD的数据保存到hdfs ,切断RDD之间的依赖关系
+      *
+      * 当job执行完成会从最后一个RDD向前回溯，如果发现有一个RDD执行了checkpoint  ，
+      * 会另启动一个job任务，将这个RDD的数据写入到hdfs,被标记的RDD会被计算两遍
+      *
+      * 为了提高速度，可以先对标记的RDD执行一把cache
+      *
+      *
+      *
+      *
+      */
+    linesRDD.checkpoint()
+
 
 
 

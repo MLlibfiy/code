@@ -10,7 +10,12 @@ object WordCount {
   def main(args: Array[String]): Unit = {
     //1、创建spark配置信息对象
     val conf = new SparkConf()
-      .setMaster("local") //本地运行模式
+
+      /**
+        * spark 配置优先级  代码的配置大于spark-submit后面指定的配置
+        *
+        */
+      //.setMaster("local") //本地运行模式
       .setAppName("WordCount") //任务名
 
     //创建spark 上下文对象，可以用来读取数据
@@ -22,7 +27,7 @@ object WordCount {
       * textFile底层实现是TextInputFormat
       * 切片规则和mr一样
       */
-    val linesRDD = sc.textFile("spark/data/words.txt")
+    val linesRDD = sc.textFile("/spark/data/words.txt")
 
     //flatMap  算子  ，先对数据做一把map操作，再扁平化
     val flatRDD = linesRDD.flatMap(line => line.split(","))
@@ -54,7 +59,7 @@ object WordCount {
       */
 
     //简写版
-    sc.textFile("spark/data/words.txt") //可以指定本地路径，也可以指定hdfs路径
+    sc.textFile("/spark/data/words.txt") //可以指定本地路径，也可以指定hdfs路径
       .flatMap(_.split(","))
       .map((_, 1))
       //.reduceByKey((x, y) => x + y)
@@ -72,7 +77,7 @@ object WordCount {
         * 触发job运行
         * action 类算子
         */
-      .saveAsTextFile("spark/data/output")
+      .saveAsTextFile("/spark/data/output")
 
 
 
