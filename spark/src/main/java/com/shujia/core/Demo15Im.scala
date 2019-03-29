@@ -1,4 +1,4 @@
-package com.shujia
+package com.shujia.core
 
 import org.apache.spark.{SparkConf, SparkContext}
 

@@ -1,12 +1,11 @@
-package com.shujia
+package com.shujia.core
 
 import org.apache.spark.{SparkConf, SparkContext}
 
-object Demo1Map {
+object Demo2Filter {
   /**
-    * map算子，传入一行返回一行
+    * filter算子，返回true 保存数据，返回false 过滤数据
     *
-    * @param args
     */
   def main(args: Array[String]): Unit = {
 
@@ -24,7 +23,8 @@ object Demo1Map {
     //把scala 集合序列化成一个RDD
     val RDD1 = sc.parallelize(list)
 
-    RDD1.map(l => l * 2).foreach(println)
+    //取出偶数
+    RDD1.filter(_ % 2 == 0).foreach(println)
 
 
   }

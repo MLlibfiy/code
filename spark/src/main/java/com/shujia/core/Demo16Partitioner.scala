@@ -1,7 +1,6 @@
-package com.shujia
+package com.shujia.core
 
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.Partitioner
+import org.apache.spark.{Partitioner, SparkConf, SparkContext}
 
 object Demo16Partitioner {
   def main(args: Array[String]): Unit = {
