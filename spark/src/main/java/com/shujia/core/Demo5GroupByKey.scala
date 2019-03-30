@@ -21,7 +21,7 @@ object Demo5GroupByKey {
     linesRDD
       .map(_.split(",")(4)) //取出班级
       .map((_, 1))
-      .groupByKey() //安装班级分组
+      .groupByKey(10) //安装班级分组
       .map(g => (g._1, g._2.toList.sum)) //组内求和
       .foreach(println)
 

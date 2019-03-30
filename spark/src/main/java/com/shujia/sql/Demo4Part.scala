@@ -1,6 +1,5 @@
 package com.shujia.sql
 
-import com.shujia.sql.Demo2Sql.Student
 import org.apache.spark.{SparkConf, SparkContext}
 import org.apache.spark.sql.SQLContext
 

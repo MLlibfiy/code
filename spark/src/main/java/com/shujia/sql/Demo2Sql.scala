@@ -11,7 +11,7 @@ object Demo2Sql {
       *
       */
 
-    val conf = new SparkConf().setAppName("sql").setMaster("local")
+    val conf = new SparkConf().setAppName("sql")//.setMaster("local")
     val sc = new SparkContext(conf)
 
     //创建sql 上下文对象
@@ -21,17 +21,16 @@ object Demo2Sql {
     import sqlContext.implicits._
 
 
-    val rdd = sc.textFile("spark/data/student.txt")
+    val rdd = sc.textFile("/data/student")
 
 
     //通过rdd创建df
 
-    val df = rdd
-      .map(_.split(","))
-      .map(line => Student(line(0), line(1), line(2).toInt, line(3), line(4)))
-      .toDF()//需要导入隐式转换  sqlContext.implicits._
+val df = rdd.map(_.split("\t")).map(line => Student(line(0), line(1), line(2).toInt, line(3), line(4))).toDF()//需要导入隐式转换  sqlContext.implicits._
 
     df.printSchema()
+    df.show()
+
     df.show()
 
     df.registerTempTable("student")
@@ -42,7 +41,7 @@ object Demo2Sql {
 
 
   }
-
-  case class Student(id: String, name: String, age: Int, gender: String, clazz: String)
-
 }
+
+case class Student(id: String, name: String, age: Int, gender: String, clazz: String)
+
