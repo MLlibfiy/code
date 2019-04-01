@@ -29,6 +29,14 @@
             <artifactId>spark-hive_2.10</artifactId>
             <version>1.6.0</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.spark/spark-streaming -->
+        <dependency>
+            <groupId>org.apache.spark</groupId>
+            <artifactId>spark-streaming_2.10</artifactId>
+            <version>1.6.0</version>
+        </dependency>
+
+
 
 
         <dependency>

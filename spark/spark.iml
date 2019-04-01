@@ -11,7 +11,7 @@
     </content>
     <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="scala-sdk-2.10.7" level="project" />
+    <orderEntry type="library" name="scala-sdk-2.10.7" level="application" />
     <orderEntry type="library" name="Maven: org.apache.spark:spark-core_2.10:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: org.apache.avro:avro-mapred:hadoop2:1.7.7" level="project" />
     <orderEntry type="library" name="Maven: org.apache.avro:avro-ipc:1.7.7" level="project" />
@@ -190,6 +190,7 @@
     <orderEntry type="library" name="Maven: org.datanucleus:datanucleus-core:3.2.10" level="project" />
     <orderEntry type="library" name="Maven: org.apache.thrift:libthrift:0.9.2" level="project" />
     <orderEntry type="library" name="Maven: org.apache.thrift:libfb303:0.9.2" level="project" />
+    <orderEntry type="library" name="Maven: org.apache.spark:spark-streaming_2.10:1.6.0" level="project" />
     <orderEntry type="library" name="Maven: mysql:mysql-connector-java:5.1.38" level="project" />
   </component>
 </module>
