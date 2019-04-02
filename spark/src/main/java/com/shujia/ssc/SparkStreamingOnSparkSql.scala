@@ -107,7 +107,7 @@ object SparkStreamingOnSparkSql {
           .toDF()
 
         //对多次使用的DF  进行缓存
-       // unionDF = unionDF.cache()
+        unionDF = unionDF.cache()
 
         unionDF.show()
 
@@ -117,8 +117,6 @@ object SparkStreamingOnSparkSql {
 
         //保存状态到mysql
         unionDF.write.mode(SaveMode.Overwrite).jdbc("jdbc:mysql://localhost:3306/student", "stat", properties)
-
-
 
 
       })
