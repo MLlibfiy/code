@@ -98,31 +98,28 @@ object SparkStreamingOnSparkSql {
           "password" -> "123456"
         )).load()
 
-
-
-
         //合并当前batch计算的结果 和之前batch 计算的结果
         var unionDF = countDF.rdd.
           union(statDF.rdd)
-          .map(row => (row.getAs[String]("clazz"), row.getAs[Int]("c")))
+          .map(row => (row.getAs[String]("clazz"), row.getAs[Long]("c")))
           .reduceByKey(_ + _)
           .map(t => Stat(t._1, t._2))
           .toDF()
 
-
         //对多次使用的DF  进行缓存
-        unionDF = unionDF.cache()
+       // unionDF = unionDF.cache()
+
+        unionDF.show()
 
         val properties = new Properties()
         properties.setProperty("user", "root")
         properties.setProperty("password", "123456")
 
-
         //保存状态到mysql
         unionDF.write.mode(SaveMode.Overwrite).jdbc("jdbc:mysql://localhost:3306/student", "stat", properties)
 
 
-        unionDF.show()
+
 
       })
 
@@ -137,4 +134,4 @@ object SparkStreamingOnSparkSql {
 
 case class Student(id: String, name: String, age: Int, gender: String, clazz: String)
 
-case class Stat(clazz: String, c: Int)
+case class Stat(clazz: String, c: Long)
