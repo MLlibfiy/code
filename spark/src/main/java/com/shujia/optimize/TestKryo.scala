@@ -38,7 +38,7 @@ object TestKryo {
       *
       */
 
-    ,
+
     var stuRDD = data
       .map(_.split(","))
       .map(line => Student(line(0), line(1), line(2).toInt, line(3), line(4)))
